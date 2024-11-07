@@ -243,7 +243,7 @@ account_created = st.selectbox(
 result = st.button("Submit Filters")
 if result: 
     random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(random_user)
+    st.dataframe(pd.DataFrame(random_user))
 
 
 '''Still need to make that button for filtering out the admins....'''

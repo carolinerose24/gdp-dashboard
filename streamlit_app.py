@@ -352,6 +352,13 @@ if test_5_pages:
     st.dataframe(df)
 
 
+
+grab_all = st.button("Test grabbing ALL of the pages")
+if grab_all:
+    df = pull_all_users_from_APIs(token)
+    st.dataframe(df)
+
+
 # PROGRESS BAR
 # Add a placeholder
 # latest_iteration = st.empty()

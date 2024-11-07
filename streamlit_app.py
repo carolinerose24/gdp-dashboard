@@ -334,7 +334,7 @@ with st.form("my_form"):
 
 if submit:
     members = get_five_pages(token)
-    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, account_created=account_created_pick)
+    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick)
     st.dataframe(df)
 
 

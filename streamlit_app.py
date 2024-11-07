@@ -24,11 +24,15 @@ def pull_all_users_from_APIs(token):
     while True:
         url = base_url + str(page)
         response = requests.get(url, headers=headers)
-        data = response.json()
-        records = data.get('records', [])
-        if not records: 
+        # data = response.json()
+        # records = data.get('records', [])
+
+        data = pd.json_normalize(response.json())
+        records_list = data['records'][0]
+        if not records_list: 
             break
-        df = pd.json_normalize(records)
+        # df = pd.json_normalize(records)
+        df = pd.json_normalize(records_list)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
         if page % 5 == 0:
@@ -302,7 +306,27 @@ if result5:
 
 
 
+test_sample_button = st.button("Test the PD samples function")
+if test_sample_button:
+    df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
+    sampled_df = df.sample(n=3)
+    sampled_df
 
+
+
+
+# PROGRESS BAR
+# Add a placeholder
+# latest_iteration = st.empty()
+# bar = st.progress(0)
+
+# for i in range(100):
+#   # Update the progress bar with each iteration.
+#   latest_iteration.text(f'Iteration {i+1}')
+#   bar.progress(i + 1)
+#   time.sleep(0.1)
+
+# '...and now we\'re done!'
 
 
 

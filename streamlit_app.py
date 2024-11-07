@@ -43,6 +43,26 @@ def pull_all_users_from_APIs(token):
 members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
 
+def get_one_page(token):
+    url = "https://app.circle.so/api/admin/v2/community_members?per_page=5&page=1"
+    headers = {'Authorization': ("Token " + token)}
+    response = requests.get(url, headers=headers)
+    # response.json()
+    data = pd.json_normalize(response.json())
+    records_list = data['records'][0]  
+    df = pd.json_normalize(records_list)
+    return pd.DataFrame(df)
+
+
+
+
+
+
+
+
+
+
+
 def get_random_members(df, number_picks=1, last_seen_option="None",
                         # posts_count=0, comments_count=0,
                         created_option="None"):#, activity_score=0):
@@ -52,7 +72,7 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
     # df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
     # df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
 
-    df = pd.DataFrame(df)
+    # df = pd.DataFrame(df)
 
     if last_seen_option != "None":
         df = filter_last_seen(df, last_seen_option)
@@ -209,10 +229,10 @@ def filter_activity_score(df, score):
 This is an app for picking a random user from a circle community based on a few filters.
 '''
 
-title = st.text_input("Input Your V2 Community Token Here", "")
+token = st.text_input("Input Your V2 Community Token Here", "")
 get_users_button = st.button("Submit Token")
 if get_users_button: 
-    members = pull_all_users_from_APIs("Token " + title)    
+    members = pull_all_users_from_APIs("Token " + token)    
 '''
 Notice that pulling all users can take a few minutes
 '''
@@ -249,6 +269,13 @@ if result:
 '''Still need to make that button for filtering out the admins....'''
 
 
+
+
+'''Test getting One page and displaying it'''
+test_page_button = st.button("Get One Page")
+if test_page_button:
+    test_df = get_one_page(token)
+    st.dataframe(test_df)
 
 
 

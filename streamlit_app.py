@@ -387,10 +387,13 @@ if test_sample_button:
     sampled_df = df.sample(n=3)
     sampled_df
 
-test_5_pages = st.button("Test 5 pages")
+test_5_pages = st.button("Test 5 pages + filter")
 if test_5_pages:
     df = get_five_pages(token)
     st.dataframe(df)
+    random_user = get_random_members(df, number_picks=1, last_seen_option="None", created_option="None")
+    # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+    st.dataframe(random_user)
 
 
 

@@ -277,7 +277,7 @@ token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 
 pick_number = st.number_input(
     label = "How many random users do you want to pick?", 
-    min_value=1, max_value=20, value="min", format="%1f"
+    min_value=1, max_value=20, value="min"#, format="%1f"
 )
 
 last_seen = st.selectbox(

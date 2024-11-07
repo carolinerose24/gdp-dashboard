@@ -47,13 +47,12 @@ def get_one_page(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
     headers = {'Authorization': ("Token " + token)}
     response = requests.get(url, headers=headers)
-    st.write(response.text)
-    st.write(response.status_code)
-
-    # data = pd.json_normalize(response.json())
-    # records_list = data['records'][0]  
-    # df = pd.json_normalize(records_list)
-    # return df
+    # st.write(response.text)
+    # st.write(response.status_code)
+    data = pd.json_normalize(response.json())
+    records_list = data['records'][0]  
+    df = pd.json_normalize(records_list)
+    return df
 
 
 
@@ -276,9 +275,8 @@ if result:
 '''Test getting One page and displaying it'''
 test_page_button = st.button("Get One Page")
 if test_page_button:
-    # test_df = 
-    get_one_page(token)
-    # st.dataframe(test_df)
+    test_df = get_one_page(token)
+    st.dataframe(test_df)
     # st.write(test_df)
 
 

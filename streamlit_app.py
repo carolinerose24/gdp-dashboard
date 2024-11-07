@@ -346,7 +346,7 @@ if test_sample_button:
     sampled_df = df.sample(n=3)
     sampled_df
 
-test_5_pages = st.button("Test the PD samples function")
+test_5_pages = st.button("Test 5 pages")
 if test_5_pages:
     df = get_five_pages(token)
     st.dataframe(df)

@@ -250,23 +250,27 @@ if result:
 
 
 
-'''Display the head of the Dataframe so I can see what it looks like:'''
-# st.dataframe(members.head(2))
-
-
-
-st.write(members.head(2))
-
-
-
-
-
 
 
 
 # Correct usage
 members5 = pd.DataFrame({'Name': ['Alice', 'Bob'], 'Age': [25, 30]})
 st.dataframe(members5)  # Passes a valid DataFrame
+
+
+
+'''Display the head of the Dataframe so I can see what it looks like:'''
+# st.dataframe(members.head(2))
+
+
+
+st.write(members)
+
+
+
+
+
+
 
 
 

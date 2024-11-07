@@ -275,7 +275,8 @@ if result:
 test_page_button = st.button("Get One Page")
 if test_page_button:
     test_df = get_one_page(token)
-    st.dataframe(test_df)
+    # st.dataframe(test_df)
+    st.write(test_df)
 
 
 

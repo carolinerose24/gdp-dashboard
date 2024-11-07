@@ -250,6 +250,10 @@ if result:
 
 
 
+'''Display the head of the Dataframe so I can see what it looks like:'''
+st.dataframe(members)
+
+
 
 
 # min_value = gdp_df['Year'].min()

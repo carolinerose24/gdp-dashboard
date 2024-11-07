@@ -283,6 +283,7 @@ This is an app for picking a random user from a circle community based on a few 
 # is there like a global variable? can it be declared, then filled, and kept at that value???
 
 
+members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
@@ -329,7 +330,7 @@ with st.form("my_form"):
    submit = st.form_submit_button('Submit my picks')
 
 if submit:
-    if not members or members.empty(): #check if there is a good token first
+    if not members or members.empty(): #check if there is a good token first?
         st.error("You need to pull the members from the API first")
     else:
         df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)

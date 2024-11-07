@@ -15,7 +15,7 @@ st.set_page_config(
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
-@st.cache_data(ttl='1d')
+# @st.cache_data(ttl='1d')
 def pull_all_users_from_APIs(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
     headers = {'Authorization': token}
@@ -31,6 +31,7 @@ def pull_all_users_from_APIs(token):
         df = pd.json_normalize(records)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
+        st.write("Made the API call for page: " + page)
         page += 1
         # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
@@ -203,13 +204,19 @@ def filter_activity_score(df, score):
 '''
 # :thumbsup: Random User Picker
 
-This is an app made by *me* that picks a random user for a circle community, probably to give a prize to
-I want to see if this change will actually show up ... ... 
+This is an app for picking a random user from a circle community based on a few filters.
+
+
 '''
 
-title = st.text_input("Community Token", "")
-if title != "":
-    members = pull_all_users_from_APIs("Token " + title)
+title = st.text_input("Input Your V2 Community Token Here", "")
+get_users_button = st.button("Submit Token")
+if get_users_button: 
+    members = pull_all_users_from_APIs("Token " + title)    
+'''
+Notice that pulling all users can take a few minutes
+'''
+
 
 # Add some spacing
 ''
@@ -234,7 +241,7 @@ if result:
     st.write(random_user)
 
 
-
+''''Still need to make that button for filtering out the admins....'''
 
 
 

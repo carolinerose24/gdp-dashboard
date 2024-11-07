@@ -59,6 +59,7 @@ def get_one_page(token):
     return df[['name', 'email', 'created_at', 'last_seen_at']]
 
 
+@st.cache_data(ttl='1d')
 def get_five_pages(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page="
     headers = {'Authorization': token}
@@ -287,11 +288,14 @@ token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
     #they put something inside, now check to see what community it is for
     st.write("This token has the community id: " + str(check_community(token)))
+else:
+    members = st.empty()
 
 pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
 if pull_button:
     if token != "Token ":
-        members = pull_all_users_from_APIs(token)
+        # members = pull_all_users_from_APIs(token) # CHANGE THIS BACK LATER ONCE I KNOW IT WORKS
+        members = get_five_pages(token)
     else:
         members = st.empty()
         st.write("You need to input a token before trying to pull from the APIs")
@@ -310,7 +314,7 @@ with st.form("my_form"):
    st.write("Choose the filters you want here:")
    picks = st.number_input(
         label = "How many random users do you want to pick?", 
-        min_value=1, max_value=20, value="min"#, format="%1f"
+        min_value=1, max_value=20, value="min"
     )
    last_seen = st.selectbox(
         "Last Seen Date",
@@ -324,7 +328,7 @@ with st.form("my_form"):
    submit = st.form_submit_button('Submit my picks')
 
 if submit:
-    if(members.empty()): #check if there is a good token first
+    if not members or members.empty(): #check if there is a good token first
         st.write("You need to pull the members from the API first")
     else:
         df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)

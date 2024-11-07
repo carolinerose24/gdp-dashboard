@@ -211,7 +211,7 @@ def check_community(token):
 
 
 
-
+members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
 
 
 
@@ -283,12 +283,12 @@ This is an app for picking a random user from a circle community based on a few 
 # is there like a global variable? can it be declared, then filled, and kept at that value???
 
 
-members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
+
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
     #they put something inside, now check to see what community it is for
-    st.write("This token has the community id: " + str(check_community(token)))
+    st.write("This token has the community id: " + str(check_community(token))) #do something for bad tokens here????
 else:
     members = st.empty()
 
@@ -329,15 +329,21 @@ with st.form("my_form"):
    
    submit = st.form_submit_button('Submit my picks')
 
+#what if the form grabs the members --> so it would be super slow the first time, but then cached after that???
+
+
 if submit:
-    if members.empty: #check if there is a good token first? not sure if this members will have what i am looking for in it
-        st.error("You need to pull the members from the API first")
-    else:
-        df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
-        st.dataframe(df)
+    members = get_five_pages(token)
+    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
+    st.dataframe(df)
 
 
 
+    # if members.empty: #check if there is a good token first? not sure if this members will have what i am looking for in it
+    #     st.error("You need to pull the members from the API first")
+    # else:
+    #     df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
+    #     st.dataframe(df)
 
 
 

@@ -276,7 +276,8 @@ This is an app for picking a random user from a circle community based on a few 
 token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 
 pick_number = st.number_input(
-    "How many random users do you want to pick?", value=None, placeholder=""
+    label = "How many random users do you want to pick?", 
+    min_value=1, max_value=20, value="min", format=str
 )
 
 last_seen = st.selectbox(

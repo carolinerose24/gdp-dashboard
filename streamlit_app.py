@@ -93,7 +93,7 @@ def get_five_pages(token):
     
     # # Display the number of API calls made
     # st.write(f"Made {page} API calls.")
-    
+    st.balloons()
     return df_all
 
 
@@ -297,7 +297,7 @@ if pull_button:
     if token != "Token ":
         # members = pull_all_users_from_APIs(token) # CHANGE THIS BACK LATER ONCE I KNOW IT WORKS
         members = get_five_pages(token)
-        st.balloons()
+        
     else:
         members = st.empty()
         st.error("You need to input a token before trying to pull from the APIs")

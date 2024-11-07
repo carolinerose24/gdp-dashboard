@@ -286,8 +286,8 @@ if get_users_button:
 #     members = st.empty()
 
 
-if not token:
-    # Token is either None or an empty string
+if token == "Token ":
+    # nothing was added yet
     members = st.empty()
 else:
     members = pull_all_users_from_APIs("Token " + token)

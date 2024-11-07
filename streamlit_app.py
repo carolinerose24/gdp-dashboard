@@ -44,7 +44,7 @@ def pull_all_users_from_APIs(token):
     st.write("Made " + str(page) + " API calls.")
     return df_all
 
-members = st.empty() # as a placeholder? not sure how that works with cacheing...
+# members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
 
 def get_one_page(token):
@@ -268,10 +268,19 @@ def filter_activity_score(df, score):
 This is an app for picking a random user from a circle community based on a few filters.
 '''
 
+#if it reloads the script everytime a button is pressed, does that mean that MEMBERS is constantly emptied out 
+# like when the submit filters button is pressed, it deletes the dataframe???
+# is there like a global variable? can it be declared, then filled, and kept at that value???
+
+
+
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 get_users_button = st.button("Submit Token")
 if get_users_button: 
-    members = pull_all_users_from_APIs("Token " + token)    
+    members = pull_all_users_from_APIs("Token " + token)  
+
+#see if this caches it???
+members =  pull_all_users_from_APIs("Token " + token) 
 '''
 Notice that pulling all users can take a few minutes
 '''

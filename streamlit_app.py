@@ -9,7 +9,7 @@ import time
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     page_title='Random User Picker',
-    page_icon=':thumbsup:', # This is an emoji shortcode. Could be a URL too.
+    page_icon=':white_check_mark:'
 )
 
 # -----------------------------------------------------------------------------
@@ -31,7 +31,8 @@ def pull_all_users_from_APIs(token):
         df = pd.json_normalize(records)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
-        st.write("Made the API call for page: " + str(page))
+        if page % 10 == 0:
+            st.write("Made the API call for page: " + str(page))
         page += 1
         # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
@@ -39,7 +40,7 @@ def pull_all_users_from_APIs(token):
     st.write("Made " + str(page) + " API calls.")
     return df_all
 
-
+members = st.empty()
 
 
 def get_random_members(member_df, number_picks=1, last_seen_option="None",
@@ -202,7 +203,7 @@ def filter_activity_score(df, score):
 
 # Set the title that appears at the top of the page.
 '''
-# :thumbsup: Random User Picker
+# :white_check_mark: Random User Picker
 
 This is an app for picking a random user from a circle community based on a few filters.
 
@@ -225,6 +226,10 @@ Notice that pulling all users can take a few minutes
 Filter By:
 '''
 
+pick_number = st.number_input(
+    "How many random users do you want to pick?", value=1, placeholder="1"
+)
+
 last_seen = st.selectbox(
     "Last Seen Date",
     ("None", "Today", "This Week", "This Month"),
@@ -237,8 +242,8 @@ account_created = st.selectbox(
 
 result = st.button("Submit Filters")
 if result: 
-    random_user = get_random_members(members, number_picks=1, last_seen_option=last_seen, created_option=account_created)
-    st.write(random_user)
+    random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+    st.dataframe(random_user)
 
 
 '''Still need to make that button for filtering out the admins....'''

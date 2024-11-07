@@ -275,6 +275,16 @@ This is an app for picking a random user from a circle community based on a few 
 
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
+if token == "Token ":
+    # nothing was added yet
+    st.write("NOTHING in the token space, so it is just a place holder for now")
+    members = st.empty()
+else:
+    st.write("Typed in something for the token, NOW RUNNING THE PULL ALL METHOD")
+    members = pull_all_users_from_APIs("Token " + token)
+
+
+
 get_users_button = st.button("Submit Token")
 if get_users_button: 
     members = pull_all_users_from_APIs(token)  
@@ -286,11 +296,7 @@ if get_users_button:
 #     members = st.empty()
 
 
-if token == "Token ":
-    # nothing was added yet
-    members = st.empty()
-else:
-    members = pull_all_users_from_APIs("Token " + token)
+
 
 
 

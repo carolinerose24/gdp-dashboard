@@ -19,7 +19,7 @@ st.set_page_config(
 def pull_all_users_from_APIs(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
     headers = {'Authorization': token}
-    df_all = pd.DataFrame()
+    df_all = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
     page = 1  
     while True:
         url = base_url + str(page)
@@ -31,7 +31,7 @@ def pull_all_users_from_APIs(token):
         df = pd.json_normalize(records)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
-        if page % 10 == 0:
+        if page % 5 == 0:
             st.write("Made the API call for page: " + str(page))
         page += 1
         # time.sleep(0.15)
@@ -40,7 +40,7 @@ def pull_all_users_from_APIs(token):
     st.write("Made " + str(page) + " API calls.")
     return df_all
 
-members = st.empty()
+members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
 
 def get_random_members(df, number_picks=1, last_seen_option="None",
@@ -51,6 +51,8 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
     # raw_df = pd.DataFrame(member_df)
     # df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
     # df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
+
+    df = pd.DataFrame(df)
 
     if last_seen_option != "None":
         df = filter_last_seen(df, last_seen_option)

@@ -273,30 +273,77 @@ This is an app for picking a random user from a circle community based on a few 
 # is there like a global variable? can it be declared, then filled, and kept at that value???
 
 
+token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 
-token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
-get_users_button = st.button("Grab ALL of the users")
+pick_number = st.number_input(
+    "How many random users do you want to pick?", value=1, placeholder="1"
+)
+
+last_seen = st.selectbox(
+    "Last Seen Date",
+    ("None", "Today", "This Week", "This Month"),
+)
+
+account_created = st.selectbox(
+    "Account Creation Date",
+    ("None", "This Month", "Last 2 Months", "On Launch")
+)
+
+result = st.button("Submit Filters")
+if result: 
+    members = get_five_pages(token1)
+    random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+    st.dataframe(random_user)
+    # st.write(random_user)
 
 
-if token == "Token ":
-    # nothing was added yet
-    st.write("NOTHING in the token space, so it is just a place holder for now")
-    members = st.empty()
-else:
-    # st.write("Typed in something for the token, NOW RUNNING THE PULL ALL METHOD")
-    # members = pull_all_users_from_APIs("Token " + token)
-    if get_users_button: 
-        st.write("about to run the full script")
-        members = pull_all_users_from_APIs(token)
-    else:
-        st.write("NOT about to run the whole script, but token WAS filled in")
-        members = st.empty() 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
+# get_users_button = st.button("Grab ALL of the users")
+
+
+# if token == "Token ":
+#     # nothing was added yet
+#     st.write("NOTHING in the token space, so it is just a place holder for now")
+#     members = st.empty()
+# else:
+#     # st.write("Typed in something for the token, NOW RUNNING THE PULL ALL METHOD")
+#     # members = pull_all_users_from_APIs("Token " + token)
+#     if get_users_button: 
+#         st.write("about to run the full script")
+#         members = pull_all_users_from_APIs(token)
+#     else:
+#         st.write("NOT about to run the whole script, but token WAS filled in")
+#         members = st.empty() # once a different button is pressed, this goes back to EMPTY
 
 
 # need to check if members goes back to empty, or if it is recalled but cached so it doesn't need to run again
 
 
-get_one_random = st.button("Test 5 pages + filter")
+get_one_random = st.button("Get One Random User")
 if get_one_random:
     # df = get_five_pages(token)
     # st.dataframe(df)
@@ -340,25 +387,7 @@ Notice that pulling all users can take a few minutes
 Filter By:
 '''
 
-pick_number = st.number_input(
-    "How many random users do you want to pick?", value=1, placeholder="1"
-)
 
-last_seen = st.selectbox(
-    "Last Seen Date",
-    ("None", "Today", "This Week", "This Month"),
-)
-
-account_created = st.selectbox(
-    "Account Creation Date",
-    ("None", "This Month", "Last 2 Months", "On Launch")
-)
-
-result = st.button("Submit Filters")
-if result: 
-    random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    # st.dataframe(random_user)
-    st.write(random_user.iloc[0,0])
 
 
 '''Still need to make that button for filtering out the admins....'''

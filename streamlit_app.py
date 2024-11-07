@@ -318,11 +318,11 @@ with st.form("my_form"):
         label = "How many random users do you want to pick?", 
         min_value=1, max_value=20, value="min"
     )
-   last_seen = st.selectbox(
+   last_seen_pick = st.selectbox(
         "Last Seen Date",
         ("None", "Today", "This Week", "This Month"),
     )
-   account_created = st.selectbox(
+   account_created_pick = st.selectbox(
         "Account Creation Date",
         ("None", "This Month", "Last 2 Months", "On Launch")
     )   
@@ -334,7 +334,7 @@ with st.form("my_form"):
 
 if submit:
     members = get_five_pages(token)
-    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
+    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, account_created=account_created_pick)
     st.dataframe(df)
 
 

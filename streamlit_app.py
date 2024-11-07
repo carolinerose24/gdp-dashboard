@@ -60,7 +60,7 @@ def get_one_page(token):
 
 
 def get_five_pages(token):
-    base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
+    base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page="
     headers = {'Authorization': token}
     df_all = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
     
@@ -90,8 +90,8 @@ def get_five_pages(token):
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
     df_all['created_at'] = pd.to_datetime(df_all['created_at'])
     
-    # Display the number of API calls made
-    st.write(f"Made {page} API calls.")
+    # # Display the number of API calls made
+    # st.write(f"Made {page} API calls.")
     
     return df_all
 
@@ -348,9 +348,8 @@ if test_sample_button:
 
 test_5_pages = st.button("Test the PD samples function")
 if test_5_pages:
-    df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
-    sampled_df = df.sample(n=3)
-    sampled_df
+    df = get_five_pages(token)
+    st.dataframe(df)
 
 
 # PROGRESS BAR

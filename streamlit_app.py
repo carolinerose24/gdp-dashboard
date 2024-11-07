@@ -44,7 +44,7 @@ members = st.empty() # as a placeholder? not sure how that works with cacheing..
 
 
 def get_one_page(token):
-    url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
+    url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"
     headers = {'Authorization': ("Token " + token)}
     response = requests.get(url, headers=headers)
     # st.write(response.text)
@@ -52,7 +52,7 @@ def get_one_page(token):
     data = pd.json_normalize(response.json())
     records_list = data['records'][0]  
     df = pd.json_normalize(records_list)
-    return df[['first_name', 'last_name']]
+    return df[['name', 'email', 'created_at', 'last_seen_at']]
 
 
 

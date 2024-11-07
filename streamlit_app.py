@@ -11,7 +11,7 @@ import time
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     page_title='Random User Picker',
-    page_icon=':thumbs_up:', # This is an emoji shortcode. Could be a URL too.
+    page_icon=':thumbsup:', # This is an emoji shortcode. Could be a URL too.
 )
 
 # -----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ gdp_df = get_gdp_data()
 
 # Set the title that appears at the top of the page.
 '''
-# :thumbs_up: title here.....
+# :thumbsup: title here.....
 
 This is an app made by *me* that picks a random user for a circle community, probably to give a prize to
 I want to see if this change will actually show up ... ... 
@@ -210,7 +210,7 @@ I want to see if this change will actually show up ... ...
 
 title = st.text_input("Community Token", "...")
 if title != "...":
-    members = pull_all_users_from_APIs(title)
+    members = pull_all_users_from_APIs("Token " + title)
 
 # Add some spacing
 ''

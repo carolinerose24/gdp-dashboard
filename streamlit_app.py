@@ -280,7 +280,15 @@ if get_users_button:
     members = pull_all_users_from_APIs("Token " + token)  
 
 #see if this caches it???
-members =  pull_all_users_from_APIs("Token " + token) 
+if token != "":
+    members =  pull_all_users_from_APIs("Token " + token) 
+else:
+    members = st.empty()
+
+
+
+
+
 '''
 Notice that pulling all users can take a few minutes
 '''

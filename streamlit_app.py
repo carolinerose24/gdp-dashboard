@@ -275,7 +275,7 @@ This is an app for picking a random user from a circle community based on a few 
 
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
-get_users_button = st.button("Submit Token")
+get_users_button = st.button("Grab ALL of the users")
 
 
 if token == "Token ":
@@ -293,6 +293,21 @@ else:
         members = st.empty() 
 
 
+# need to check if members goes back to empty, or if it is recalled but cached so it doesn't need to run again
+
+
+get_one_random = st.button("Test 5 pages + filter")
+if get_one_random:
+    # df = get_five_pages(token)
+    # st.dataframe(df)
+    random_user = get_random_members(members, number_picks=1, last_seen_option="None", created_option="None")
+    # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+    st.dataframe(random_user)
+
+
+# if token but not get users button
+# THEN can't RUN THIS BUTTON YET????
+# try this next
 
 
  

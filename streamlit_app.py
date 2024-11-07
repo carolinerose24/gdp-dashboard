@@ -330,7 +330,7 @@ with st.form("my_form"):
    submit = st.form_submit_button('Submit my picks')
 
 if submit:
-    if not members or members.empty(): #check if there is a good token first?
+    if members.empty(): #check if there is a good token first? not sure if this members will have what i am looking for in it
         st.error("You need to pull the members from the API first")
     else:
         df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)

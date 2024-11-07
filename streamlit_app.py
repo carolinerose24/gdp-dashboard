@@ -198,6 +198,15 @@ def filter_activity_score(df, score):
     
 
 
+def check_community(token):
+    #can't get the community name anywhere? could just return the community ID for now???
+    url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
+    headers = {'Authorization': token}
+    response = requests.get(url, headers=headers)
+    data = pd.json_normalize(response.json())
+    records_list = data['records'][0]  
+    df = pd.json_normalize(records_list)
+    return df['community_id'][0]
 
 
 
@@ -273,29 +282,97 @@ This is an app for picking a random user from a circle community based on a few 
 # is there like a global variable? can it be declared, then filled, and kept at that value???
 
 
-token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 
-pick_number = st.number_input(
-    label = "How many random users do you want to pick?", 
-    min_value=1, max_value=20, value="min"#, format="%1f"
-)
+token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
+if token != "Token ":
+    #they put something inside, now check to see what community it is for
+    st.write("This token has the community id: " + check_community(token))
 
-last_seen = st.selectbox(
-    "Last Seen Date",
-    ("None", "Today", "This Week", "This Month"),
-)
+pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
+if pull_button:
+    members = pull_all_users_from_APIs(token)
+else:
+    members = st.empty()
+    st.write("You need to input a token before trying to pull from the APIs")
 
-account_created = st.selectbox(
-    "Account Creation Date",
-    ("None", "This Month", "Last 2 Months", "On Launch")
-)
 
-result = st.button("Submit Filters")
-if result: 
-    members = get_five_pages(token1)
-    random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(random_user)
-    # st.write(random_user)
+
+
+'''TO TEST DIFFERENT FORMS - see if it solves the reloading problem'''
+
+# then put the form in a fragment --> JUST RERUN THE FILTER PART, NOT the grab users part...
+
+
+# maybe have TWO forms??? like 1 for the token and then one for the filtering????
+
+with st.form("my_form"):
+   st.write("Choose the filters you want here:")
+   picks = st.number_input(
+        label = "How many random users do you want to pick?", 
+        min_value=1, max_value=20, value="min"#, format="%1f"
+    )
+   last_seen = st.selectbox(
+        "Last Seen Date",
+        ("None", "Today", "This Week", "This Month"),
+    )
+   account_created = st.selectbox(
+        "Account Creation Date",
+        ("None", "This Month", "Last 2 Months", "On Launch")
+    )   
+   
+   submit = st.form_submit_button('Submit my picks')
+
+if submit:
+    if(members.empty()): #check if there is a good token first
+        st.write("You need to pull the members from the API first")
+    else:
+        df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
+        st.dataframe(df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
+
+# pick_number = st.number_input(
+#     label = "How many random users do you want to pick?", 
+#     min_value=1, max_value=20, value="min"#, format="%1f"
+# )
+
+# last_seen = st.selectbox(
+#     "Last Seen Date",
+#     ("None", "Today", "This Week", "This Month"),
+# )
+
+# account_created = st.selectbox(
+#     "Account Creation Date",
+#     ("None", "This Month", "Last 2 Months", "On Launch")
+# )
+
+# result = st.button("Submit Filters and Pull From API")
+# if result: 
+#     if token1 == "Token ":
+#         st.write("don't do it")
+#     else:
+#         members = get_five_pages(token1)
+#         random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+#         st.dataframe(random_user)
+
 
 
 

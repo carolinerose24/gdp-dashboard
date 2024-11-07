@@ -15,7 +15,7 @@ st.set_page_config(
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
-# @st.cache_data(ttl='1d')
+@st.cache_data(ttl='1d')
 def pull_all_users_from_APIs(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
     headers = {'Authorization': token}
@@ -204,10 +204,7 @@ def filter_activity_score(df, score):
 # Set the title that appears at the top of the page.
 '''
 # :white_check_mark: Random User Picker
-
 This is an app for picking a random user from a circle community based on a few filters.
-
-
 '''
 
 title = st.text_input("Input Your V2 Community Token Here", "")
@@ -243,7 +240,8 @@ account_created = st.selectbox(
 result = st.button("Submit Filters")
 if result: 
     random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(random_user)
+    # st.dataframe(random_user)
+    st.write(random_user.iloc[0,0])
 
 
 '''Still need to make that button for filtering out the admins....'''

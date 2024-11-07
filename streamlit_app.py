@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 import requests
-import json
-import datetime as dt
-from datetime import datetime
-import time
+# import json
+# import datetime as dt
+# from datetime import datetime
+# import time
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
@@ -44,14 +44,16 @@ members = st.empty() # as a placeholder? not sure how that works with cacheing..
 
 
 def get_one_page(token):
-    url = "https://app.circle.so/api/admin/v2/community_members?per_page=5&page=1"
+    url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
     headers = {'Authorization': ("Token " + token)}
     response = requests.get(url, headers=headers)
-    # response.json()
-    data = pd.json_normalize(response.json())
-    records_list = data['records'][0]  
-    df = pd.json_normalize(records_list)
-    return pd.DataFrame(df)
+    st.write(response.text)
+    st.write(response.status_code)
+
+    # data = pd.json_normalize(response.json())
+    # records_list = data['records'][0]  
+    # df = pd.json_normalize(records_list)
+    # return df
 
 
 
@@ -274,9 +276,10 @@ if result:
 '''Test getting One page and displaying it'''
 test_page_button = st.button("Get One Page")
 if test_page_button:
-    test_df = get_one_page(token)
+    # test_df = 
+    get_one_page(token)
     # st.dataframe(test_df)
-    st.write(test_df)
+    # st.write(test_df)
 
 
 

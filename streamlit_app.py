@@ -68,7 +68,7 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
     # if activity_score > 0:
     #     df = filter_activity_score(df, activity_score)
         
-    st.write(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100:.3f}%") 
+    # st.write("There were " + {len(df)} + " people in the final group, so the odds were " + {number_picks}/{len(df)} + ", or " + {number_picks/len(df)* 100:.3f} + "%") 
     # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
 
     return df.sample(n=number_picks)
@@ -78,18 +78,18 @@ def filter_last_seen(df, date):
     today = pd.Timestamp.now(tz='UTC')
     match date:
         case "Today": #TODAY
-            print(f"Filtering to users that were last seen today:")
+            # print(f"Filtering to users that were last seen today:")
             start_of_today = today.normalize()  # Resets time to 00:00:00
             today_filter = df['last_seen_at'] >= start_of_today
             return df.loc[today_filter]
 
         case "This Week": #THIS WEEK
-            print(f"Filtering to users that were last seen sometime this week:")
+            # print(f"Filtering to users that were last seen sometime this week:")
             this_week_filter = df['last_seen_at'] >= (today - pd.DateOffset(days=7))
             return df.loc[this_week_filter]
 
         case "This Month": #THIS MONTH
-            print(f"Filtering to users that were last seen sometime this month:")
+            # print(f"Filtering to users that were last seen sometime this month:")
             this_month_filter = (df['last_seen_at'] >= pd.to_datetime(f"{today.year}-{today.month}-01", utc=True)) 
             return df.loc[this_month_filter]
                 
@@ -98,12 +98,12 @@ def filter_last_seen(df, date):
 
 
 def filter_posts(df, count):
-    print(f"Filtering to users that have made at least {count} post(s):")
+    # print(f"Filtering to users that have made at least {count} post(s):")
     return df.loc[(df['posts_count'] >= count)]
 
 
 def filter_comments(df, count):
-    print(f"Filtering to users that have made at least {count} comment(s):")
+    # print(f"Filtering to users that have made at least {count} comment(s):")
     return df.loc[(df['posts_count'] >= count)]
 
 
@@ -111,16 +111,16 @@ def filter_account_creation(df, date):
     today = pd.Timestamp.now(tz='UTC')
     match date:
         case "This Month":
-            print(f"Filtering to users that became members this month:")
+            # print(f"Filtering to users that became members this month:")
             this_month_filter = (df['created_at'] >= pd.to_datetime(f"{today.year}-{today.month}-01", utc=True)) 
             return df.loc[this_month_filter]
         case "Last Two Months":
-            print(f"Filtering to users that became members this or last month:")
+            # print(f"Filtering to users that became members this or last month:")
             last_month_start = pd.to_datetime(f"{today.year}-{today.month - 1}-01", utc=True) if today.month > 1 else pd.to_datetime(f"{today.year - 1}-12-01", utc=True)
             last_two_months_filter = df['created_at'] >= last_month_start
             return df.loc[last_two_months_filter]
         case "On Launch":
-            print(f"Filtering to users that became members in the launch month (May 2024):")
+            # print(f"Filtering to users that became members in the launch month (May 2024):")
             #May 2024
             start_date = pd.to_datetime("2024-05-01", utc=True)
             end_date = pd.to_datetime("2024-05-31 23:59:59", utc=True)
@@ -132,7 +132,7 @@ def filter_account_creation(df, date):
 
 
 def filter_activity_score(df, score):
-    print(f"Filtering to users that have an activity score of at least {score}:")
+    # print(f"Filtering to users that have an activity score of at least {score}:")
     return df.loc[(df['activity_score'] >= score)]
     
 

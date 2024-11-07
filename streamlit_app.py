@@ -277,7 +277,7 @@ This is an app for picking a random user from a circle community based on a few 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 get_users_button = st.button("Submit Token")
 if get_users_button: 
-    members = pull_all_users_from_APIs("Token " + token)  
+    members = pull_all_users_from_APIs(token)  
 
 # #see if this caches it???
 # if token != "":

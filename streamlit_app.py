@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import math
-from pathlib import Path
 import requests
 import json
 import datetime as dt
@@ -34,28 +32,29 @@ def pull_all_users_from_APIs(token):
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
         page += 1
-        time.sleep(0.15)
+        # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
     df_all['created_at'] = pd.to_datetime(df_all['created_at'])
+    st.write("Made " + page + " API calls.")
     return df_all
 
 
 
 
-def get_random_members(member_df, number_picks=1, last_seen_option="NONE",
+def get_random_members(member_df, number_picks=1, last_seen_option="None",
                         # posts_count=0, comments_count=0,
-                        created_option="NONE"):#, activity_score=0):
+                        created_option="None"):#, activity_score=0):
     
     #filter out admins/gigg people -- have a special option for this??????
     raw_df = pd.DataFrame(member_df)
     df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
     df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
 
-    if last_seen_option != "NONE":
+    if last_seen_option != "None":
         df = filter_last_seen(df, last_seen_option)
         #call the date function to filter out by certain dates
 
-    if created_option != "NONE":
+    if created_option != "None":
         df = filter_account_creation(df, created_option)
 
     # if posts_count > 0:
@@ -76,20 +75,20 @@ def get_random_members(member_df, number_picks=1, last_seen_option="NONE",
 def filter_last_seen(df, date):
     today = pd.Timestamp.now(tz='UTC')
     match date:
-        case "TODAY": #TODAY
+        case "Today": #TODAY
             print(f"Filtering to users that were last seen today:")
             start_of_today = today.normalize()  # Resets time to 00:00:00
             today_filter = df['last_seen_at'] >= start_of_today
             return df.loc[today_filter]
 
-        case "THIS WEEK": #THIS WEEK
+        case "This Week": #THIS WEEK
             print(f"Filtering to users that were last seen sometime this week:")
-            this_week_filter = all_users['last_seen_at'] >= (today - pd.DateOffset(days=7))
+            this_week_filter = df['last_seen_at'] >= (today - pd.DateOffset(days=7))
             return df.loc[this_week_filter]
 
-        case "THIS MONTH": #THIS MONTH
+        case "This Month": #THIS MONTH
             print(f"Filtering to users that were last seen sometime this month:")
-            this_month_filter = (all_users['last_seen_at'] >= pd.to_datetime(f"{today.year}-{today.month}-01", utc=True)) 
+            this_month_filter = (df['last_seen_at'] >= pd.to_datetime(f"{today.year}-{today.month}-01", utc=True)) 
             return df.loc[this_month_filter]
                 
     #specific date -- do something HERE
@@ -109,18 +108,18 @@ def filter_comments(df, count):
 def filter_account_creation(df, date):
     today = pd.Timestamp.now(tz='UTC')
     match date:
-        case "THIS MONTH": #THIS MONTH
+        case "This Month":
             print(f"Filtering to users that became members this month:")
             this_month_filter = (df['created_at'] >= pd.to_datetime(f"{today.year}-{today.month}-01", utc=True)) 
             return df.loc[this_month_filter]
-        case "TWO MONTHS":
+        case "Last Two Months":
             print(f"Filtering to users that became members this or last month:")
             last_month_start = pd.to_datetime(f"{today.year}-{today.month - 1}-01", utc=True) if today.month > 1 else pd.to_datetime(f"{today.year - 1}-12-01", utc=True)
-            last_two_months_filter = all_users['created_at'] >= last_month_start
+            last_two_months_filter = df['created_at'] >= last_month_start
             return df.loc[last_two_months_filter]
-        case "ON LAUNCH":
+        case "On Launch":
             print(f"Filtering to users that became members in the launch month (May 2024):")
-            # Define the start and end of May 2024
+            #May 2024
             start_date = pd.to_datetime("2024-05-01", utc=True)
             end_date = pd.to_datetime("2024-05-31 23:59:59", utc=True)
             may_users_filter = (df['created_at'] >= start_date) & (df['created_at'] <= end_date)
@@ -150,66 +149,66 @@ def filter_activity_score(df, score):
 
 
 
-@st.cache_data
-def get_gdp_data():
-    """Grab GDP data from a CSV file.
+# @st.cache_data
+# def get_gdp_data():
+#     """Grab GDP data from a CSV file.
 
-    This uses caching to avoid having to read the file every time. If we were
-    reading from an HTTP endpoint instead of a file, it's a good idea to set
-    a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
-    """
+#     This uses caching to avoid having to read the file every time. If we were
+#     reading from an HTTP endpoint instead of a file, it's a good idea to set
+#     a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
+#     """
 
-    # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
-    DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-    raw_gdp_df = pd.read_csv(DATA_FILENAME)
+#     # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
+#     DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
+#     raw_gdp_df = pd.read_csv(DATA_FILENAME)
 
-    MIN_YEAR = 1960
-    MAX_YEAR = 2022
+#     MIN_YEAR = 1960
+#     MAX_YEAR = 2022
 
-    # The data above has columns like:
-    # - Country Name
-    # - Country Code
-    # - [Stuff I don't care about]
-    # - GDP for 1960
-    # - GDP for 1961
-    # - GDP for 1962
-    # - ...
-    # - GDP for 2022
-    #
-    # ...but I want this instead:
-    # - Country Name
-    # - Country Code
-    # - Year
-    # - GDP
-    #
-    # So let's pivot all those year-columns into two: Year and GDP
-    gdp_df = raw_gdp_df.melt(
-        ['Country Code'],
-        [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
-        'Year',
-        'GDP',
-    )
+#     # The data above has columns like:
+#     # - Country Name
+#     # - Country Code
+#     # - [Stuff I don't care about]
+#     # - GDP for 1960
+#     # - GDP for 1961
+#     # - GDP for 1962
+#     # - ...
+#     # - GDP for 2022
+#     #
+#     # ...but I want this instead:
+#     # - Country Name
+#     # - Country Code
+#     # - Year
+#     # - GDP
+#     #
+#     # So let's pivot all those year-columns into two: Year and GDP
+#     gdp_df = raw_gdp_df.melt(
+#         ['Country Code'],
+#         [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
+#         'Year',
+#         'GDP',
+#     )
 
-    # Convert years from string to integers
-    gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
+#     # Convert years from string to integers
+#     gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
 
-    return gdp_df
+#     return gdp_df
 
-gdp_df = get_gdp_data()
+# gdp_df = get_gdp_data()
 
 # -----------------------------------------------------------------------------
 # Draw the actual page
 
 # Set the title that appears at the top of the page.
 '''
-# :thumbsup: title here.....
+# :thumbsup: Random User Picker
 
 This is an app made by *me* that picks a random user for a circle community, probably to give a prize to
 I want to see if this change will actually show up ... ... 
 '''
 
-title = st.text_input("Community Token", "...")
-if title != "...":
+title = st.text_input("Community Token", "")
+if title != "":
     members = pull_all_users_from_APIs("Token " + title)
 
 # Add some spacing
@@ -231,7 +230,7 @@ account_created = st.selectbox(
 
 result = st.button("Submit Filters")
 if result: 
-    random_user = get_random_members(members, number_picks=1, last_seen_option="NONE", created_option="NONE")
+    random_user = get_random_members(members, number_picks=1, last_seen_option=last_seen, created_option=account_created)
     st.write(random_user)
 
 
@@ -241,77 +240,77 @@ if result:
 
 
 
-min_value = gdp_df['Year'].min()
-max_value = gdp_df['Year'].max()
+# min_value = gdp_df['Year'].min()
+# max_value = gdp_df['Year'].max()
 
-from_year, to_year = st.slider(
-    'Which years are you interested in?',
-    min_value=min_value,
-    max_value=max_value,
-    value=[min_value, max_value])
+# from_year, to_year = st.slider(
+#     'Which years are you interested in?',
+#     min_value=min_value,
+#     max_value=max_value,
+#     value=[min_value, max_value])
 
-countries = gdp_df['Country Code'].unique()
+# countries = gdp_df['Country Code'].unique()
 
-if not len(countries):
-    st.warning("Select at least one country")
+# if not len(countries):
+#     st.warning("Select at least one country")
 
-selected_countries = st.multiselect(
-    'Which countries would you like to view?',
-    countries,
-    ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
+# selected_countries = st.multiselect(
+#     'Which countries would you like to view?',
+#     countries,
+#     ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
 
-''
-''
-''
+# ''
+# ''
+# ''
 
-# Filter the data
-filtered_gdp_df = gdp_df[
-    (gdp_df['Country Code'].isin(selected_countries))
-    & (gdp_df['Year'] <= to_year)
-    & (from_year <= gdp_df['Year'])
-]
+# # Filter the data
+# filtered_gdp_df = gdp_df[
+#     (gdp_df['Country Code'].isin(selected_countries))
+#     & (gdp_df['Year'] <= to_year)
+#     & (from_year <= gdp_df['Year'])
+# ]
 
-st.header('GDP over time', divider='gray')
+# st.header('GDP over time', divider='gray')
 
-''
+# ''
 
-st.line_chart(
-    filtered_gdp_df,
-    x='Year',
-    y='GDP',
-    color='Country Code',
-)
+# st.line_chart(
+#     filtered_gdp_df,
+#     x='Year',
+#     y='GDP',
+#     color='Country Code',
+# )
 
-''
-''
+# ''
+# ''
 
 
-first_year = gdp_df[gdp_df['Year'] == from_year]
-last_year = gdp_df[gdp_df['Year'] == to_year]
+# first_year = gdp_df[gdp_df['Year'] == from_year]
+# last_year = gdp_df[gdp_df['Year'] == to_year]
 
-st.header(f'GDP in {to_year}', divider='gray')
+# st.header(f'GDP in {to_year}', divider='gray')
 
-''
+# ''
 
-cols = st.columns(4)
+# cols = st.columns(4)
 
-for i, country in enumerate(selected_countries):
-    col = cols[i % len(cols)]
+# for i, country in enumerate(selected_countries):
+#     col = cols[i % len(cols)]
 
-    with col:
-        first_gdp = first_year[first_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-        last_gdp = last_year[last_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
+#     with col:
+#         first_gdp = first_year[first_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
+#         last_gdp = last_year[last_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
 
-        if math.isnan(first_gdp):
-            growth = 'n/a'
-            delta_color = 'off'
-        else:
-            growth = f'{last_gdp / first_gdp:,.2f}x'
-            delta_color = 'normal'
+#         if math.isnan(first_gdp):
+#             growth = 'n/a'
+#             delta_color = 'off'
+#         else:
+#             growth = f'{last_gdp / first_gdp:,.2f}x'
+#             delta_color = 'normal'
 
-        st.metric(
-            label=f'{country} GDP',
-            value=f'{last_gdp:,.0f}B',
-            delta=growth,
-            delta_color=delta_color
-        )
+#         st.metric(
+#             label=f'{country} GDP',
+#             value=f'{last_gdp:,.0f}B',
+#             delta=growth,
+#             delta_color=delta_color
+#         )

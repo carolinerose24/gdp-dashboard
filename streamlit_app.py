@@ -71,7 +71,7 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
     # st.write("There were " + {len(df)} + " people in the final group, so the odds were " + {number_picks}/{len(df)} + ", or " + {number_picks/len(df)* 100:.3f} + "%") 
     # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
 
-    return df.sample(n=number_picks)
+    return pd.DataFrame(df).sample(n=number_picks)
 
 
 def filter_last_seen(df, date):
@@ -243,7 +243,7 @@ account_created = st.selectbox(
 result = st.button("Submit Filters")
 if result: 
     random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(pd.DataFrame(random_user))
+    st.dataframe(random_user)
 
 
 '''Still need to make that button for filtering out the admins....'''

@@ -31,12 +31,12 @@ def pull_all_users_from_APIs(token):
         df = pd.json_normalize(records)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
-        st.write("Made the API call for page: " + page)
+        st.write("Made the API call for page: " + str(page))
         page += 1
         # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
     df_all['created_at'] = pd.to_datetime(df_all['created_at'])
-    st.write("Made " + page + " API calls.")
+    st.write("Made " + str(page) + " API calls.")
     return df_all
 
 
@@ -241,7 +241,7 @@ if result:
     st.write(random_user)
 
 
-''''Still need to make that button for filtering out the admins....'''
+'''Still need to make that button for filtering out the admins....'''
 
 
 

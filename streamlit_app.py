@@ -52,7 +52,7 @@ def get_one_page(token):
     data = pd.json_normalize(response.json())
     records_list = data['records'][0]  
     df = pd.json_normalize(records_list)
-    return df
+    return df[['first_name', 'last_name']]
 
 
 

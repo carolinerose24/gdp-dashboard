@@ -15,7 +15,7 @@ st.set_page_config(
 # -----------------------------------------------------------------------------
 # Declare some useful functions.
 
-# @st.cache_data(ttl='1d')
+@st.cache_data(ttl='1d')
 def pull_all_users_from_APIs(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
     headers = {'Authorization': token}
@@ -43,14 +43,14 @@ def pull_all_users_from_APIs(token):
 members = st.empty()
 
 
-def get_random_members(member_df, number_picks=1, last_seen_option="None",
+def get_random_members(df, number_picks=1, last_seen_option="None",
                         # posts_count=0, comments_count=0,
                         created_option="None"):#, activity_score=0):
     
     #filter out admins/gigg people -- have a special option for this??????
-    raw_df = pd.DataFrame(member_df)
-    df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
-    df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
+    # raw_df = pd.DataFrame(member_df)
+    # df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
+    # df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
 
     if last_seen_option != "None":
         df = filter_last_seen(df, last_seen_option)
@@ -68,7 +68,7 @@ def get_random_members(member_df, number_picks=1, last_seen_option="None",
     # if activity_score > 0:
     #     df = filter_activity_score(df, activity_score)
         
-    print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100:.3f}%") 
+    st.write(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100:.3f}%") 
     # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
 
     return df.sample(n=number_picks)

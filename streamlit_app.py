@@ -286,19 +286,20 @@ This is an app for picking a random user from a circle community based on a few 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
     #they put something inside, now check to see what community it is for
-    st.write("This token has the community id: " + check_community(token))
+    st.write("This token has the community id: " + str(check_community(token)))
 
 pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
 if pull_button:
-    members = pull_all_users_from_APIs(token)
-else:
-    members = st.empty()
-    st.write("You need to input a token before trying to pull from the APIs")
+    if token != "Token ":
+        members = pull_all_users_from_APIs(token)
+    else:
+        members = st.empty()
+        st.write("You need to input a token before trying to pull from the APIs")
 
 
 
 
-'''TO TEST DIFFERENT FORMS - see if it solves the reloading problem'''
+# '''TO TEST DIFFERENT FORMS - see if it solves the reloading problem'''
 
 # then put the form in a fragment --> JUST RERUN THE FILTER PART, NOT the grab users part...
 

@@ -49,7 +49,7 @@ members = st.empty() # as a placeholder? not sure how that works with cacheing..
 
 def get_one_page(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"
-    headers = {'Authorization': ("Token " + token)}
+    headers = {'Authorization': (token)}
     response = requests.get(url, headers=headers)
     # st.write(response.text)
     # st.write(response.status_code)
@@ -59,7 +59,41 @@ def get_one_page(token):
     return df[['name', 'email', 'created_at', 'last_seen_at']]
 
 
+def get_five_pages(token):
+    base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
+    headers = {'Authorization': token}
+    df_all = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
+    
+    # Set the maximum number of pages to fetch
+    max_pages = 5
+    for page in range(1, max_pages + 1):  # Loop over the first 5 pages
+        url = base_url + str(page)
+        response = requests.get(url, headers=headers)
 
+        # Flatten JSON response into a DataFrame
+        data = response.json()
+        records_list = data.get('records', [])
+        
+        if not records_list:
+            break  # Exit the loop if there are no records (early exit)
+
+        # Normalize the records into a DataFrame and select required columns
+        df = pd.json_normalize(records_list)
+        df = df[['name', 'email', 'created_at', 'last_seen_at']]  # Modify as needed
+        df_all = pd.concat([df_all, df], ignore_index=True)
+
+        # Optionally show progress in the Streamlit app
+        if page % 1 == 0:
+            st.write(f"Made the API call for page: {page}")
+    
+    # Convert datetime fields to pandas datetime objects
+    df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
+    df_all['created_at'] = pd.to_datetime(df_all['created_at'])
+    
+    # Display the number of API calls made
+    st.write(f"Made {page} API calls.")
+    
+    return df_all
 
 
 
@@ -234,7 +268,7 @@ def filter_activity_score(df, score):
 This is an app for picking a random user from a circle community based on a few filters.
 '''
 
-token = st.text_input("Input Your V2 Community Token Here", "")
+token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 get_users_button = st.button("Submit Token")
 if get_users_button: 
     members = pull_all_users_from_APIs("Token " + token)    
@@ -312,7 +346,11 @@ if test_sample_button:
     sampled_df = df.sample(n=3)
     sampled_df
 
-
+test_5_pages = st.button("Test the PD samples function")
+if test_5_pages:
+    df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
+    sampled_df = df.sample(n=3)
+    sampled_df
 
 
 # PROGRESS BAR

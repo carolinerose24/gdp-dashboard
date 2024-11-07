@@ -279,13 +279,23 @@ get_users_button = st.button("Submit Token")
 if get_users_button: 
     members = pull_all_users_from_APIs("Token " + token)  
 
-#see if this caches it???
-if token != "":
-    members =  pull_all_users_from_APIs("Token " + token) 
-else:
+# #see if this caches it???
+# if token != "":
+#     members =  pull_all_users_from_APIs("Token " + token) 
+# else:
+#     members = st.empty()
+
+
+if not token:
+    # Token is either None or an empty string
     members = st.empty()
+else:
+    members = pull_all_users_from_APIs("Token " + token)
 
 
+
+# could create a test token button where you can first test if it is a good token, THEN run the big function on it???
+#so that bad tokens don't crash it??
 
 
 

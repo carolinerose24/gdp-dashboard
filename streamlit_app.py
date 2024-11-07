@@ -13,9 +13,9 @@ st.set_page_config(
 # Declare some useful functions.
 
 @st.cache_data(ttl='1d')
-def pull_all_users_from_APIs():
+def pull_all_users_from_APIs(token):
     base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=100&page="
-    headers = {'Authorization': tokenv2}
+    headers = {'Authorization': token}
     df_all = pd.DataFrame()
     page = 1  
     while True:
@@ -34,7 +34,7 @@ def pull_all_users_from_APIs():
     df_all['created_at'] = pd.to_datetime(df_all['created_at'])
     return df_all
 
-members = pull_all_users_from_APIs()
+
 
 
 def get_random_members(member_df, number_picks=1, last_seen_option="NONE",
@@ -202,6 +202,10 @@ gdp_df = get_gdp_data()
 This is an app made by *me* that picks a random user for a circle community, probably to give a prize to
 I want to see if this change will actually show up ... ... 
 '''
+
+title = st.text_input("Community Token", "...")
+if title != "...":
+    members = pull_all_users_from_APIs(title)
 
 # Add some spacing
 ''

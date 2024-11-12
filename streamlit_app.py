@@ -67,7 +67,7 @@ def get_five_pages(token):
     df_all = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
     
     # Set the maximum number of pages to fetch
-    max_pages = 5
+    max_pages = 10
     for page in range(1, max_pages + 1):  # Loop over the first 5 pages
         url = base_url + str(page)
         response = requests.get(url, headers=headers)

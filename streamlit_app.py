@@ -47,10 +47,10 @@ def pull_all_users_from_APIs(token):
 
 # members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
-@st.cache_data
-def convert_df(_df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return _df.to_csv().encode("utf-8")
+# @st.cache_data
+# def convert_df(_df):
+#     # IMPORTANT: Cache the conversion to prevent computation on every rerun
+#     return _df.to_csv().encode("utf-8")
 
 def get_one_page(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"
@@ -225,7 +225,7 @@ def check_community(token):
         return response.status_code
     
 members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
-picks_df = st.empty()
+# picks_df = st.empty()
 
 
 # -----------------------------------------------------------------------------
@@ -279,12 +279,12 @@ if submit:
         st.error(f"There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
 
 
-st.download_button(
-    label="Download random picks as CSV",
-    data=convert_df(picks_df),
-    file_name="random_picks.csv",
-    mime="text/csv",
-)
+# st.download_button(
+#     label="Download random picks as CSV",
+#     data=convert_df(picks_df),
+#     file_name="random_picks.csv",
+#     mime="text/csv",
+# )
 
 # csv = convert_df(my_large_df)
 

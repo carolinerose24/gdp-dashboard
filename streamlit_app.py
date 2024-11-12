@@ -48,9 +48,9 @@ def pull_all_users_from_APIs(token):
 # members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
 @st.cache_data
-def convert_df(df):
+def convert_df(_df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode("utf-8")
+    return _df.to_csv().encode("utf-8")
 
 def get_one_page(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"

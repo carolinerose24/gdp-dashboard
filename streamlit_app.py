@@ -343,8 +343,11 @@ with st.form("my_form"):
 if submit:
     # members = get_five_pages(token)
     members = pull_all_users_from_APIs(token)
-    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
-    st.dataframe(df)
+    try:
+        df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
+        st.dataframe(df)
+    except ValueError as e:
+        st.error("There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
 
 
 

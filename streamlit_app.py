@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+import random
 # import json
 # import datetime as dt
 # from datetime import datetime
@@ -85,7 +86,7 @@ def get_five_pages(token):
 
         # Optionally show progress in the Streamlit app
         if page % 1 == 0:
-            st.write(f"Made the API call for page: {page}")
+            st.write(f"Made the API call for page: {page} + Random Number: {random.randint(1, 100)}")
     
     # Convert datetime fields to pandas datetime objects
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])

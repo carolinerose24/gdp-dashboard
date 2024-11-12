@@ -47,6 +47,10 @@ def pull_all_users_from_APIs(token):
 
 # members = st.empty() # as a placeholder? not sure how that works with cacheing...
 
+@st.cache_data
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode("utf-8")
 
 def get_one_page(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"
@@ -268,14 +272,20 @@ with st.form("my_form"):
 if submit:
     members = pull_all_users_from_APIs(token)
     try:
-        df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
-        st.dataframe(df)
+        picks_df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
+        st.dataframe(picks_df)
     except ValueError as e:
         st.error(f"There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
 
 
+st.download_button(
+    label="Download random picks as CSV",
+    data=convert_df(picks_df),
+    file_name="random_picks.csv",
+    mime="text/csv",
+)
 
-
+# csv = convert_df(my_large_df)
 
 
 # # PROGRESS BAR

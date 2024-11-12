@@ -225,6 +225,7 @@ def check_community(token):
         return response.status_code
     
 members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
+picks_df = st.empty()
 
 
 # -----------------------------------------------------------------------------

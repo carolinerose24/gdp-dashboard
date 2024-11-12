@@ -36,8 +36,8 @@ def pull_all_users_from_APIs(token):
         df = pd.json_normalize(records_list)
         df = df[['name', 'email', 'created_at', 'last_seen_at']] #comments_count, posts_count, activity_score
         df_all = pd.concat([df_all, df], ignore_index=True)
-        if page % 5 == 0:
-            st.write("Made the API call for page: " + str(page))
+        # if page % 5 == 0:
+        #     st.write("Made the API call for page: " + str(page))
         page += 1
         # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
@@ -289,21 +289,27 @@ This is an app for picking a random user from a circle community based on a few 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
     #they put something inside, now check to see what community it is for
+
+    #if checking the token is valid, print that it is valid, otherwise print something about it being invalid
+
     st.write("This token has the community id: " + str(check_community(token))) #do something for bad tokens here????
 else:
     members = st.empty()
+    
 
-pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
-if pull_button:
-    if token != "Token ":
-        # members = pull_all_users_from_APIs(token) # CHANGE THIS BACK LATER ONCE I KNOW IT WORKS
-        members = get_five_pages(token)
+# pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
+# if pull_button:
+#     if token != "Token ":
+#         # members = pull_all_users_from_APIs(token) # CHANGE THIS BACK LATER ONCE I KNOW IT WORKS
+#         members = get_five_pages(token)
         
-    else:
-        members = st.empty()
-        st.error("You need to input a token before trying to pull from the APIs")
+#     else:
+#         members = st.empty()
+#         st.error("You need to input a token before trying to pull from the APIs")
 
-
+'''
+Notice that pulling all users can take a few minutes
+'''
 
 
 # '''TO TEST DIFFERENT FORMS - see if it solves the reloading problem'''
@@ -436,13 +442,13 @@ if submit:
 # need to check if members goes back to empty, or if it is recalled but cached so it doesn't need to run again
 
 
-get_one_random = st.button("Get One Random User")
-if get_one_random:
-    # df = get_five_pages(token)
-    # st.dataframe(df)
-    random_user = get_random_members(members, number_picks=1, last_seen_option="None", created_option="None")
-    # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(random_user)
+# get_one_random = st.button("Get One Random User")
+# if get_one_random:
+#     # df = get_five_pages(token)
+#     # st.dataframe(df)
+#     random_user = get_random_members(members, number_picks=1, last_seen_option="None", created_option="None")
+#     # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+#     st.dataframe(random_user)
 
 
 # if token but not get users button
@@ -468,32 +474,30 @@ if get_one_random:
 
 
 
-'''
-Notice that pulling all users can take a few minutes
-'''
-
-
-# Add some spacing
-''
-''
-'''
-Filter By:
-'''
 
 
 
-
-'''Still need to make that button for filtering out the admins....'''
+# # Add some spacing
+# ''
+# ''
+# '''
+# Filter By:
+# '''
 
 
 
 
-'''Test getting One page and displaying it'''
-test_page_button = st.button("Get One Page")
-if test_page_button:
-    test_df = get_one_page(token)
-    st.dataframe(test_df)
-    # st.write(test_df)
+# '''Still need to make that button for filtering out the admins....'''
+
+
+
+
+# '''Test getting One page and displaying it'''
+# test_page_button = st.button("Get One Page")
+# if test_page_button:
+#     test_df = get_one_page(token)
+#     st.dataframe(test_df)
+#     # st.write(test_df)
 
 
 
@@ -511,47 +515,47 @@ if test_page_button:
 
 # st.write(members)
 
-result5 = st.button("Show members")
-if result5: 
-    # random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(members)
+# result5 = st.button("Show members")
+# if result5: 
+#     # random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+#     st.dataframe(members)
 
 
 
-test_sample_button = st.button("Test the PD samples function")
-if test_sample_button:
-    df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
-    sampled_df = df.sample(n=3)
-    sampled_df
+# test_sample_button = st.button("Test the PD samples function")
+# if test_sample_button:
+#     df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
+#     sampled_df = df.sample(n=3)
+#     sampled_df
 
-test_5_pages = st.button("Test 5 pages + filter")
-if test_5_pages:
-    df = get_five_pages(token)
-    st.dataframe(df)
-    random_user = get_random_members(df, number_picks=1, last_seen_option="None", created_option="None")
-    # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-    st.dataframe(random_user)
-
-
-
-grab_all = st.button("Test grabbing ALL of the pages")
-if grab_all:
-    df = pull_all_users_from_APIs(token)
-    st.dataframe(df)
+# test_5_pages = st.button("Test 5 pages + filter")
+# if test_5_pages:
+#     df = get_five_pages(token)
+#     st.dataframe(df)
+#     random_user = get_random_members(df, number_picks=1, last_seen_option="None", created_option="None")
+#     # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
+#     st.dataframe(random_user)
 
 
-# PROGRESS BAR
-# Add a placeholder
-# latest_iteration = st.empty()
-# bar = st.progress(0)
 
-# for i in range(100):
-#   # Update the progress bar with each iteration.
-#   latest_iteration.text(f'Iteration {i+1}')
-#   bar.progress(i + 1)
-#   time.sleep(0.1)
+# grab_all = st.button("Test grabbing ALL of the pages")
+# if grab_all:
+#     df = pull_all_users_from_APIs(token)
+#     st.dataframe(df)
 
-# '...and now we\'re done!'
+
+# # PROGRESS BAR
+# # Add a placeholder
+# # latest_iteration = st.empty()
+# # bar = st.progress(0)
+
+# # for i in range(100):
+# #   # Update the progress bar with each iteration.
+# #   latest_iteration.text(f'Iteration {i+1}')
+# #   bar.progress(i + 1)
+# #   time.sleep(0.1)
+
+# # '...and now we\'re done!'
 
 
 

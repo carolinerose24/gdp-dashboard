@@ -45,79 +45,10 @@ def pull_all_users_from_APIs(token):
     # st.write("Made " + str(page) + " API calls.")
     return df_all
 
-# members = st.empty() # as a placeholder? not sure how that works with cacheing...
-
-# @st.cache_data
-# def convert_df(_df):
-#     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-#     return _df.to_csv().encode("utf-8")
-
-def get_one_page(token):
-    url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page=1"
-    headers = {'Authorization': (token)}
-    response = requests.get(url, headers=headers)
-    # st.write(response.text)
-    # st.write(response.status_code)
-    data = pd.json_normalize(response.json())
-    records_list = data['records'][0]  
-    df = pd.json_normalize(records_list)
-    return df[['name', 'email', 'created_at', 'last_seen_at']]
-
-
-@st.cache_data(ttl='1d')
-def get_five_pages(token):
-    base_url = "https://app.circle.so/api/admin/v2/community_members?per_page=10&page="
-    headers = {'Authorization': token}
-    df_all = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
-    
-    # Set the maximum number of pages to fetch
-    max_pages = 10
-    for page in range(1, max_pages + 1):  # Loop over the first 5 pages
-        url = base_url + str(page)
-        response = requests.get(url, headers=headers)
-
-        # Flatten JSON response into a DataFrame
-        data = response.json()
-        records_list = data.get('records', [])
-        
-        if not records_list:
-            break  # Exit the loop if there are no records (early exit)
-
-        # Normalize the records into a DataFrame and select required columns
-        df = pd.json_normalize(records_list)
-        df = df[['name', 'email', 'created_at', 'last_seen_at']]  # Modify as needed
-        df_all = pd.concat([df_all, df], ignore_index=True)
-
-        # Optionally show progress in the Streamlit app
-        if page % 1 == 0:
-            st.write(f"Made the API call for page: {page} + Random Number: {random.randint(1, 100)}")
-    
-    # Convert datetime fields to pandas datetime objects
-    df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
-    df_all['created_at'] = pd.to_datetime(df_all['created_at'])
-    
-    # # Display the number of API calls made
-    # st.write(f"Made {page} API calls.")
-    st.balloons()
-    return df_all
-
-
-
-
-
-
-
-
 def get_random_members(df, number_picks=1, last_seen_option="None",
                         # posts_count=0, comments_count=0,
                         created_option="None", filter_admins=True):#, activity_score=0):
     
-    #filter out admins/gigg people -- have a special option for this??????
-    # raw_df = pd.DataFrame(member_df)
-    # df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
-    # df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
-
-    # df = pd.DataFrame(df)
 
     if last_seen_option != "None":
         df = filter_last_seen(df, last_seen_option)
@@ -142,8 +73,6 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
         df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
 
     st.write(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks / len(df) * 100:.3f}%")
-    # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
-
 
     return pd.DataFrame(df).sample(n=number_picks)
 
@@ -225,7 +154,6 @@ def check_community(token):
         return response.status_code
     
 members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
-# picks_df = st.empty()
 
 
 # -----------------------------------------------------------------------------
@@ -234,9 +162,14 @@ members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
 # Set the title that appears at the top of the page.
 
 '''
-# Random User Picker
+# Random User Picker:
 This is an app for picking a random user from a circle community based on a few filters. The first time you run it, it may take a couple minutes to pull everything from the API, but it should be much faster each time after that.
+
+### To Get Your Token:
+To use this app, you need a Circle V2 Token. If you are an admin for a community, you can click on the community name/drop down in the top left corner of the community site. If you navigate to the developer's page and then the token page, you can create a V2 token (not V1 or headless of data!!). 
 '''
+st.image("images/admin_dropdown.jpg", caption = "Image of the admin dropdown menu")
+
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
@@ -278,26 +211,3 @@ if submit:
     except ValueError as e:
         st.error(f"There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
 
-
-# st.download_button(
-#     label="Download random picks as CSV",
-#     data=convert_df(picks_df),
-#     file_name="random_picks.csv",
-#     mime="text/csv",
-# )
-
-# csv = convert_df(my_large_df)
-
-
-# # PROGRESS BAR
-# # Add a placeholder
-# # latest_iteration = st.empty()
-# # bar = st.progress(0)
-
-# # for i in range(100):
-# #   # Update the progress bar with each iteration.
-# #   latest_iteration.text(f'Iteration {i+1}')
-# #   bar.progress(i + 1)
-# #   time.sleep(0.1)
-
-# # '...and now we\'re done!'

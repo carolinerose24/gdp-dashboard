@@ -42,7 +42,7 @@ def pull_all_users_from_APIs(token):
         # time.sleep(0.15)
     df_all['last_seen_at'] = pd.to_datetime(df_all['last_seen_at'])
     df_all['created_at'] = pd.to_datetime(df_all['created_at'])
-    st.write("Made " + str(page) + " API calls.")
+    # st.write("Made " + str(page) + " API calls.")
     return df_all
 
 # members = st.empty() # as a placeholder? not sure how that works with cacheing...
@@ -106,7 +106,7 @@ def get_five_pages(token):
 
 def get_random_members(df, number_picks=1, last_seen_option="None",
                         # posts_count=0, comments_count=0,
-                        created_option="None"):#, activity_score=0):
+                        created_option="None", filter_admins=True):#, activity_score=0):
     
     #filter out admins/gigg people -- have a special option for this??????
     # raw_df = pd.DataFrame(member_df)
@@ -133,6 +133,11 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
         
     # st.write("There were " + {len(df)} + " people in the final group, so the odds were " + {number_picks}/{len(df)} + ", or " + {number_picks/len(df)* 100:.3f} + "%") 
     # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
+
+    if filter_admins:
+        raw_df = pd.DataFrame(df)
+        df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
+        df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
 
     return pd.DataFrame(df).sample(n=number_picks)
 
@@ -205,10 +210,15 @@ def check_community(token):
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
     headers = {'Authorization': token}
     response = requests.get(url, headers=headers)
-    data = pd.json_normalize(response.json())
-    records_list = data['records'][0]  
-    df = pd.json_normalize(records_list)
-    return df['community_id'][0]
+
+    if response.status_code == 200:
+        data = pd.json_normalize(response.json())
+        records_list = data['records'][0]  
+        df = pd.json_normalize(records_list)
+        return df['community_id'][0]
+    else:
+        return response.status_code
+    
 
 
 
@@ -275,15 +285,12 @@ members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
 
 # Set the title that appears at the top of the page.
 '''
-# :white_check_mark: Random User Picker
-This is an app for picking a random user from a circle community based on a few filters.
+# Random User Picker
+This is an app for picking a random user from a circle community based on a few filters. The first time you run it, it may take a couple minutes to pull everything from the API, but it should be much faster each time after that.
 '''
 
-#if it reloads the script everytime a button is pressed, does that mean that MEMBERS is constantly emptied out 
-# like when the submit filters button is pressed, it deletes the dataframe???
-# is there like a global variable? can it be declared, then filled, and kept at that value???
-
-
+#should I have an export to csv button????
+#have a check on/off for filtering out admins
 
 
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
@@ -291,8 +298,11 @@ if token != "Token ":
     #they put something inside, now check to see what community it is for
 
     #if checking the token is valid, print that it is valid, otherwise print something about it being invalid
-
-    st.write("This token has the community id: " + str(check_community(token))) #do something for bad tokens here????
+    token_response = str(check_community(token))
+    if token_response == '401':
+        st.write("This in an invalid token, please try again.")
+    else:
+        st.write("This token has the community id: " + str(check_community(token))) #do something for bad tokens here????
 else:
     members = st.empty()
     
@@ -307,17 +317,7 @@ else:
 #         members = st.empty()
 #         st.error("You need to input a token before trying to pull from the APIs")
 
-'''
-Notice that pulling all users can take a few minutes
-'''
 
-
-# '''TO TEST DIFFERENT FORMS - see if it solves the reloading problem'''
-
-# then put the form in a fragment --> JUST RERUN THE FILTER PART, NOT the grab users part...
-
-
-# maybe have TWO forms??? like 1 for the token and then one for the filtering????
 
 with st.form("my_form"):
    st.write("Choose the filters you want here:")
@@ -333,6 +333,7 @@ with st.form("my_form"):
         "Account Creation Date",
         ("None", "This Month", "Last 2 Months", "On Launch")
     )   
+   filter_admins_check = st.checkbox("Filter out Admins and Gigg accounts", value = True)
    
    submit = st.form_submit_button('Submit my picks')
 
@@ -342,7 +343,7 @@ with st.form("my_form"):
 if submit:
     # members = get_five_pages(token)
     members = pull_all_users_from_APIs(token)
-    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick)
+    df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
     st.dataframe(df)
 
 

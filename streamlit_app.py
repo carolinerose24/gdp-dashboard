@@ -131,13 +131,15 @@ def get_random_members(df, number_picks=1, last_seen_option="None",
     # if activity_score > 0:
     #     df = filter_activity_score(df, activity_score)
         
-    # st.write("There were " + {len(df)} + " people in the final group, so the odds were " + {number_picks}/{len(df)} + ", or " + {number_picks/len(df)* 100:.3f} + "%") 
-    # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
 
     if filter_admins:
         raw_df = pd.DataFrame(df)
         df_no_gigg = raw_df[~raw_df['email'].str.contains('gigg', case=False, na=False)]
         df = df_no_gigg[~df_no_gigg['name'].str.contains('admin', case=False, na=False)]
+
+    st.write(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks / len(df) * 100:.3f}%")
+    # print(f"There were {len(df)} people in the final group, so the odds were {number_picks}/{len(df)}, or {number_picks/len(df)* 100}%") #maybe calculate the odds of people chosen then?? 1/XXX
+
 
     return pd.DataFrame(df).sample(n=number_picks)
 
@@ -204,7 +206,6 @@ def filter_activity_score(df, score):
     return df.loc[(df['activity_score'] >= score)]
     
 
-
 def check_community(token):
     #can't get the community name anywhere? could just return the community ID for now???
     url = "https://app.circle.so/api/admin/v2/community_members?per_page=1&page=1"
@@ -219,105 +220,31 @@ def check_community(token):
     else:
         return response.status_code
     
-
-
-
 members = pd.DataFrame(columns=['name', 'email', 'created_at', 'last_seen_at'])
 
-
-
-
-
-
-
-
-
-
-# @st.cache_data
-# def get_gdp_data():
-#     """Grab GDP data from a CSV file.
-
-#     This uses caching to avoid having to read the file every time. If we were
-#     reading from an HTTP endpoint instead of a file, it's a good idea to set
-#     a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
-#     """
-
-#     # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
-#     DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-#     raw_gdp_df = pd.read_csv(DATA_FILENAME)
-
-#     MIN_YEAR = 1960
-#     MAX_YEAR = 2022
-
-#     # The data above has columns like:
-#     # - Country Name
-#     # - Country Code
-#     # - [Stuff I don't care about]
-#     # - GDP for 1960
-#     # - GDP for 1961
-#     # - GDP for 1962
-#     # - ...
-#     # - GDP for 2022
-#     #
-#     # ...but I want this instead:
-#     # - Country Name
-#     # - Country Code
-#     # - Year
-#     # - GDP
-#     #
-#     # So let's pivot all those year-columns into two: Year and GDP
-#     gdp_df = raw_gdp_df.melt(
-#         ['Country Code'],
-#         [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
-#         'Year',
-#         'GDP',
-#     )
-
-#     # Convert years from string to integers
-#     gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
-
-#     return gdp_df
-
-# gdp_df = get_gdp_data()
 
 # -----------------------------------------------------------------------------
 # Draw the actual page
 
 # Set the title that appears at the top of the page.
+
 '''
 # Random User Picker
 This is an app for picking a random user from a circle community based on a few filters. The first time you run it, it may take a couple minutes to pull everything from the API, but it should be much faster each time after that.
 '''
 
-#should I have an export to csv button????
-#have a check on/off for filtering out admins
-
-
 token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
 if token != "Token ":
-    #they put something inside, now check to see what community it is for
 
     #if checking the token is valid, print that it is valid, otherwise print something about it being invalid
     token_response = str(check_community(token))
     if token_response == '401':
         st.write("This in an invalid token, please try again.")
     else:
-        st.write("This token has the community id: " + str(check_community(token))) #do something for bad tokens here????
+        st.write("This token has the community id: " + str(check_community(token))) 
 else:
     members = st.empty()
     
-
-# pull_button = st.button("Press this button to pull from the API (might take a few minutes)")
-# if pull_button:
-#     if token != "Token ":
-#         # members = pull_all_users_from_APIs(token) # CHANGE THIS BACK LATER ONCE I KNOW IT WORKS
-#         members = get_five_pages(token)
-        
-#     else:
-#         members = st.empty()
-#         st.error("You need to input a token before trying to pull from the APIs")
-
-
 
 with st.form("my_form"):
    st.write("Choose the filters you want here:")
@@ -337,215 +264,18 @@ with st.form("my_form"):
    
    submit = st.form_submit_button('Submit my picks')
 
-#what if the form grabs the members --> so it would be super slow the first time, but then cached after that???
-
 
 if submit:
-    # members = get_five_pages(token)
     members = pull_all_users_from_APIs(token)
     try:
         df = get_random_members(members, number_picks=picks, last_seen_option=last_seen_pick, created_option=account_created_pick, filter_admins=filter_admins_check)
         st.dataframe(df)
     except ValueError as e:
-        st.error("There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
+        st.error(f"There are not {picks} members that fit these parameters. Please try a smaller number or choose different filters. ")
 
 
 
-    # if members.empty: #check if there is a good token first? not sure if this members will have what i am looking for in it
-    #     st.error("You need to pull the members from the API first")
-    # else:
-    #     df = get_random_members(members, number_picks=picks, last_seen_option=last_seen, account_created=account_created)
-    #     st.dataframe(df)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# token1 = "Token " + st.text_input("Input Your V2 Community Token Here", "")
-
-# pick_number = st.number_input(
-#     label = "How many random users do you want to pick?", 
-#     min_value=1, max_value=20, value="min"#, format="%1f"
-# )
-
-# last_seen = st.selectbox(
-#     "Last Seen Date",
-#     ("None", "Today", "This Week", "This Month"),
-# )
-
-# account_created = st.selectbox(
-#     "Account Creation Date",
-#     ("None", "This Month", "Last 2 Months", "On Launch")
-# )
-
-# result = st.button("Submit Filters and Pull From API")
-# if result: 
-#     if token1 == "Token ":
-#         st.write("don't do it")
-#     else:
-#         members = get_five_pages(token1)
-#         random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-#         st.dataframe(random_user)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# token = "Token " + st.text_input("Input Your V2 Community Token Here", "")
-# get_users_button = st.button("Grab ALL of the users")
-
-
-# if token == "Token ":
-#     # nothing was added yet
-#     st.write("NOTHING in the token space, so it is just a place holder for now")
-#     members = st.empty()
-# else:
-#     # st.write("Typed in something for the token, NOW RUNNING THE PULL ALL METHOD")
-#     # members = pull_all_users_from_APIs("Token " + token)
-#     if get_users_button: 
-#         st.write("about to run the full script")
-#         members = pull_all_users_from_APIs(token)
-#     else:
-#         st.write("NOT about to run the whole script, but token WAS filled in")
-#         members = st.empty() # once a different button is pressed, this goes back to EMPTY
-
-
-# need to check if members goes back to empty, or if it is recalled but cached so it doesn't need to run again
-
-
-# get_one_random = st.button("Get One Random User")
-# if get_one_random:
-#     # df = get_five_pages(token)
-#     # st.dataframe(df)
-#     random_user = get_random_members(members, number_picks=1, last_seen_option="None", created_option="None")
-#     # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-#     st.dataframe(random_user)
-
-
-# if token but not get users button
-# THEN can't RUN THIS BUTTON YET????
-# try this next
-
-
- 
-
-# #see if this caches it???
-# if token != "":
-#     members =  pull_all_users_from_APIs("Token " + token) 
-# else:
-#     members = st.empty()
-
-
-
-
-
-
-# could create a test token button where you can first test if it is a good token, THEN run the big function on it???
-#so that bad tokens don't crash it??
-
-
-
-
-
-
-# # Add some spacing
-# ''
-# ''
-# '''
-# Filter By:
-# '''
-
-
-
-
-# '''Still need to make that button for filtering out the admins....'''
-
-
-
-
-# '''Test getting One page and displaying it'''
-# test_page_button = st.button("Get One Page")
-# if test_page_button:
-#     test_df = get_one_page(token)
-#     st.dataframe(test_df)
-#     # st.write(test_df)
-
-
-
-
-# # Correct usage
-# members5 = pd.DataFrame({'Name': ['Alice', 'Bob'], 'Age': [25, 30]})
-# st.dataframe(members5)  # Passes a valid DataFrame
-
-
-
-# '''Display the head of the Dataframe so I can see what it looks like:'''
-# st.dataframe(members.head(2))
-
-
-
-# st.write(members)
-
-# result5 = st.button("Show members")
-# if result5: 
-#     # random_user = get_random_members(members, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-#     st.dataframe(members)
-
-
-
-# test_sample_button = st.button("Test the PD samples function")
-# if test_sample_button:
-#     df = pd.DataFrame({'A': range(1, 11), 'B': range(11, 21)})
-#     sampled_df = df.sample(n=3)
-#     sampled_df
-
-# test_5_pages = st.button("Test 5 pages + filter")
-# if test_5_pages:
-#     df = get_five_pages(token)
-#     st.dataframe(df)
-#     random_user = get_random_members(df, number_picks=1, last_seen_option="None", created_option="None")
-#     # random_user = get_random_members(df, number_picks=pick_number, last_seen_option=last_seen, created_option=account_created)
-#     st.dataframe(random_user)
-
-
-
-# grab_all = st.button("Test grabbing ALL of the pages")
-# if grab_all:
-#     df = pull_all_users_from_APIs(token)
-#     st.dataframe(df)
 
 
 # # PROGRESS BAR
@@ -560,9 +290,3 @@ if submit:
 # #   time.sleep(0.1)
 
 # # '...and now we\'re done!'
-
-
-
-
-
-
